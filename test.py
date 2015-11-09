@@ -34,10 +34,16 @@ def random_gameboard():
     for x in range (0, gameboard_size):
         for y in range (0, gameboard_size):
             obj = random_object()
+            Gameboard[x][y] = obj
             obj.x = x*image_size
             obj.y = y*image_size
-            Gameboard[x][y] = obj
             
+def delete_object(x,y):
+    global Gameboard
+    global gameboard_size
+    if (x > gameboard_size or y > gameboard_size or x < 0 or y < 0):
+        return
+    Gameboard[x][y] = None
 
 def create_objects():
     global all_objects
@@ -59,6 +65,12 @@ def poll_events():
         if event.type == KEYDOWN:
             if event.key == K_ESCAPE:
                 cleanup()
+        elif event.type == MOUSEBUTTONDOWN:
+            if event.button == 1:
+                x,y = pygame.mouse.get_pos()
+                x = int(int(x)/image_size)
+                y = int(int(y)/image_size)
+                delete_object(x, y)
 
 def load_images():
     global image_cache
@@ -73,10 +85,12 @@ def main():
     create_objects()
     random_gameboard()
     while True:
+        screen.fill((0,0,0))
         poll_events()
         for row in Gameboard:
             for obj in row:
-                obj.draw();
+                if (obj is not None):
+                    obj.draw();
         pygame.display.flip()
 
 main()
