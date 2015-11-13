@@ -21,12 +21,17 @@ class Element:
         self.index = _index
         self.sprite = image_cache[self.index]
 
-    def draw(self):
-        screen.blit(self.sprite,(self.x,self.y))
+    def draw(self,x,y):
+        screen.blit(self.sprite,(x*image_size, y*image_size))
 
-    def move(self, new_x, new_y):
-        self.x = new_x
-        self.y = new_y
+def move_element(obj, x, y):
+    global gameboard_size
+    if (x < 0) or (y < 0) or x > (gameboard_size) or (y > gameboard_size):
+        return
+    if Gameboard[x][y] is not None:
+        print(x,y," is not None")
+        return
+    Gameboard[x][y] = obj
 
 def random_gameboard():
     global gameboard_size
@@ -37,6 +42,15 @@ def random_gameboard():
             Gameboard[x][y] = obj
             obj.x = x*image_size
             obj.y = y*image_size
+
+def drop_column(x, y, count):
+    delete_object(x,y)
+    if Gameboard[x][y] is not None:
+        return
+    for i in range(y-1,-1,-1):
+        move_element(Gameboard[x][i],x,i+count)
+        delete_object(x,i)
+    
             
 def delete_object(x,y):
     global Gameboard
@@ -70,7 +84,7 @@ def poll_events():
                 x,y = pygame.mouse.get_pos()
                 x = int(int(x)/image_size)
                 y = int(int(y)/image_size)
-                delete_object(x, y)
+                drop_column(x, y, 1)
 
 def load_images():
     global image_cache
@@ -87,10 +101,11 @@ def main():
     while True:
         screen.fill((0,0,0))
         poll_events()
-        for row in Gameboard:
-            for obj in row:
+        for x in range(0,gameboard_size):
+            for y in range(0, gameboard_size):
+                obj = Gameboard[x][y]
                 if (obj is not None):
-                    obj.draw();
+                    obj.draw(x, y);
         pygame.display.flip()
 
 main()
