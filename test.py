@@ -43,6 +43,25 @@ class Element:
         if game_state is not Game_State.animation:
             self.moving = False
 
+class Delete_Request:
+    x = 0
+    y = 0
+    x_length = 0
+    y_length = 0
+    def __init__(self, _x, _y, _x_length, _y_length):
+        self.x = _x
+        self.y = _y
+        self.x_length = _x_length
+        self.y_length = _y_length
+        
+    def delete(self):
+        if self.x_length > 0:
+            for i in range(0, self.x_length):
+                delete_object(self.x+i, self.y)
+        elif self.y_length > 0:
+            for i in range(0, self.y_length):
+                delete_object(self.x, self.y+i)
+
 def move_element(obj, x, y):
     global gameboard_size
     if (x < 0) or (y < 0) or x > (gameboard_size) or (y > gameboard_size):
@@ -64,6 +83,19 @@ def random_gameboard():
             obj.x = x*image_size
             obj.y = y*image_size
 
+def add_elements():
+    global gameboard_size
+    global Gameboard
+    for x in range(0, gameboard_size):
+        for y in range(0, gameboard_size):
+            offset = gameboard_size-1-y
+            obj = Gameboard[x][offset]
+            if obj is None:
+                if offset == 0:
+                    move_element(random_object(),x,offset)
+                else:
+                    move_element(Gameboard[x][offset-1],x,offset)
+
 def drop_column(x, y, count):
     global gameboard_size
     if x < 0 or y < 0 or x > gameboard_size or y > gameboard_size:
@@ -75,9 +107,10 @@ def drop_column(x, y, count):
     for i in range(y-1, -count, -1):
         move_element(Gameboard[x][i],x,i+count)
         delete_object(x,i)
-    for i in range(0, count):
-        obj = random_object()
-        move_element(obj,x,i)
+    #for i in range(0, count):
+    #    obj = random_object()
+    #    move_element(obj,x,i)
+    add_elements()
     set_game_state(Game_State.animation)
             
 def delete_object(x,y):
@@ -98,6 +131,7 @@ def check_adjacency(match_length):
     global Gameboard
     global gameboard_size
     match_found = False
+    delete_requests = []
     for x in range(0, gameboard_size):
         match_count = 0
         to_match = Gameboard[x][0].index
@@ -107,14 +141,45 @@ def check_adjacency(match_length):
             else:
                 if match_count >= match_length:
                     match_found = True
-                    drop_column(x, y-match_count, match_count)
+                    new_req = Delete_Request(x, y-match_count, 0, match_count)
+                    delete_requests.append(new_req)
                 match_count = 1
             to_match = Gameboard[x][y].index
         if match_count >= match_length:
             match_found = True
-            drop_column(x, gameboard_size-match_count, match_count)
-    return match_found
+            new_req = Delete_Request(x, gameboard_size-match_count, 0, match_count)
+            delete_requests.append(new_req)
+
+    delete_requests.extend(check_horiz_adjacency(match_length))
     
+    for request in delete_requests:
+        request.delete()
+    return match_found
+
+def check_horiz_adjacency(match_length):
+    global Gameboard
+    global gameboard_size
+    match_found = False
+    delete_requests = []
+    for y in range(0, gameboard_size):
+        match_count = 0
+        to_match = Gameboard[0][y].index
+        for x in range(0, gameboard_size):
+            if Gameboard[x][y].index == to_match:
+                match_count = match_count+1
+            else:
+                if match_count >= match_length:
+                    match_found = True
+                    new_req = Delete_Request(x-match_count, y, match_count, 0)
+                    delete_requests.append(new_req)
+                match_count = 1
+            to_match = Gameboard[x][y].index
+        if match_count >= match_length:
+            match_found = True
+            new_req = Delete_Request(gameboard_size-match_count, y, match_count, 0)
+            delete_requests.append(new_req)
+
+    return delete_requests
 
 def random_object():
     global all_objects
@@ -129,6 +194,9 @@ def poll_events():
         if event.type == KEYDOWN:
             if event.key == K_ESCAPE:
                 cleanup()
+            elif event.key == K_SPACE:
+                check_adjacency(3)
+                #set_game_state(Game_State.update)
         elif event.type == MOUSEBUTTONDOWN:
             if event.button == 1:
                 x,y = pygame.mouse.get_pos()
