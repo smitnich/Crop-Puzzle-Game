@@ -13,12 +13,15 @@ match_length = 3
 sprite_paths = ['gfx/boulder.png', 'gfx/fire.png', 'gfx/ice.png']
 image_cache = []
 Gameboard = [[0 for x in range(gameboard_size)] for x in range(gameboard_size)] 
+selected_element = [-1, -1]
 
 class Game_State(IntEnum):
     ready = 1
     animation = 2
     update = 3
     last_state = 4
+
+cursor_pos = [0, 0]
 
 game_state = Game_State.ready
 anim_progress = 0.0
@@ -38,6 +41,10 @@ class Element:
         else:
             screen.blit(self.sprite,(x*image_size, y*image_size))
 
+    def draw_true(self, x, y):
+        global image_size
+        screen.blit(self.sprite, (x-image_size/2, y-image_size/2))
+    
     def update(self):
         global game_state
         if game_state is not Game_State.animation:
@@ -208,6 +215,8 @@ def cleanup():
     sys.exit()
 
 def poll_events():
+    global cursor_pos
+    global selected_element
     for event in pygame.event.get():
         if event.type == KEYDOWN:
             if event.key == K_ESCAPE:
@@ -217,13 +226,14 @@ def poll_events():
             elif event.key == K_RETURN:
                 check_drop()
                 set_game_state(Game_State.animation)
-                #set_game_state(Game_State.update)
         elif event.type == MOUSEBUTTONDOWN:
             if event.button == 1:
                 x,y = pygame.mouse.get_pos()
                 x = int(int(x)/image_size)
                 y = int(int(y)/image_size)
-                drop_column(x, y, 1)
+                selected_element = [x, y]
+        elif event.type == MOUSEMOTION:
+            cursor_pos = pygame.mouse.get_pos()
 
 def load_images():
     global image_cache
@@ -233,7 +243,7 @@ def load_images():
 
 def do_animations():
     global anim_progress
-    anim_progress += 1
+    anim_progress += 2
     if anim_progress >= image_size:
         anim_progress = 0.0
         set_game_state(Game_State.update)
@@ -257,8 +267,14 @@ def set_game_state(new_state):
         return
     game_state = new_state
 
+def get_selected_element():
+    global Gameboard
+    return Gameboard[selected_element[0]][selected_element[1]]
+
 def main():
     global screen
+    global cursor_pos
+    global selected_element
     screen = pygame.display.set_mode((1024, 768))
     load_images()
     create_objects()
@@ -270,9 +286,13 @@ def main():
         for x in range(0,gameboard_size):
             for y in range(0, gameboard_size):
                 obj = Gameboard[x][y]
-                if (obj is not None):
+                if selected_element == [x, y]:
+                    continue
+                elif (obj is not None):
                     obj.update()
                     obj.draw(x, y)
+        if selected_element is not (-1, -1):
+            get_selected_element().draw_true(cursor_pos[0], cursor_pos[1])
         pygame.display.flip()
 
 main()
