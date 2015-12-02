@@ -238,8 +238,12 @@ def poll_events():
 def load_images():
     global image_cache
     global sprite_paths
+    #We use pink as the transparency color currently
+    transparent = (255, 0, 220)
     for path in sprite_paths:
-        image_cache = image_cache + [pygame.image.load(path)]
+        image_cache = image_cache + [pygame.image.load(path).convert()]
+    for img in image_cache:
+        img.set_colorkey(transparent)
 
 def do_animations():
     global anim_progress
