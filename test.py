@@ -14,6 +14,7 @@ sprite_paths = ['gfx/boulder.png', 'gfx/fire.png', 'gfx/ice.png']
 image_cache = []
 Gameboard = [[0 for x in range(gameboard_size)] for x in range(gameboard_size)] 
 selected_element = [-1, -1]
+background = None
 
 class Game_State(IntEnum):
     ready = 1
@@ -238,12 +239,14 @@ def poll_events():
 def load_images():
     global image_cache
     global sprite_paths
+    global background
     #We use pink as the transparency color currently
     transparent = (255, 0, 220)
     for path in sprite_paths:
         image_cache = image_cache + [pygame.image.load(path).convert()]
     for img in image_cache:
         img.set_colorkey(transparent)
+    background = pygame.image.load("gfx/background.jpg")
 
 def do_animations():
     global anim_progress
@@ -275,6 +278,10 @@ def get_selected_element():
     global Gameboard
     return Gameboard[selected_element[0]][selected_element[1]]
 
+def draw_background():
+    global background
+    screen.blit(background, (0, 0))
+
 def main():
     global screen
     global cursor_pos
@@ -286,6 +293,7 @@ def main():
     Gameboard[5][5] = None 
     while True:
         screen.fill((0,0,0))
+        draw_background()
         game_loop()
         for x in range(0,gameboard_size):
             for y in range(0, gameboard_size):
