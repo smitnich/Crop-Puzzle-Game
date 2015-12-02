@@ -9,8 +9,9 @@ all_objects = None
 gameboard_size = 10
 image_size = 48
 
+margin = (64, 64)
 match_length = 3
-sprite_paths = ['gfx/boulder.png', 'gfx/fire.png', 'gfx/ice.png']
+sprite_paths = ['gfx/fire.png', 'gfx/ice.png', 'gfx/boulder.png']
 image_cache = []
 Gameboard = [[0 for x in range(gameboard_size)] for x in range(gameboard_size)] 
 selected_element = [-1, -1]
@@ -37,13 +38,18 @@ class Element:
 
     def draw(self,x,y):
         global anim_progress
+        global margin
         if self.moving:
-            screen.blit(self.sprite,(x*image_size, (y-1)*image_size+int(anim_progress)))
+            x = x*image_size+margin[0]
+            y = y*image_size+int(anim_progress)+margin[1]
         else:
-            screen.blit(self.sprite,(x*image_size, y*image_size))
+            x = x*image_size+margin[0]
+            y = y*image_size+margin[1]
+        screen.blit(self.sprite,(x,y))
 
     def draw_true(self, x, y):
         global image_size
+        global margin
         screen.blit(self.sprite, (x-image_size/2, y-image_size/2))
     
     def update(self):
@@ -230,9 +236,10 @@ def poll_events():
         elif event.type == MOUSEBUTTONDOWN:
             if event.button == 1:
                 x,y = pygame.mouse.get_pos()
-                x = int(int(x)/image_size)
-                y = int(int(y)/image_size)
-                selected_element = [x, y]
+                x = int(int(x-margin[0])/image_size)
+                y = int(int(y-margin[1])/image_size)
+                if not (x < 0 or x >= gameboard_size or y < 0 or y >= gameboard_size):
+                    selected_element = [x, y]
         elif event.type == MOUSEMOTION:
             cursor_pos = pygame.mouse.get_pos()
 
