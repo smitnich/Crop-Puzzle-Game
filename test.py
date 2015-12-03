@@ -151,6 +151,18 @@ def create_objects():
     obj3 = Element(2)
     all_objects = [obj1, obj2, obj3]
 
+def swap_elements(first, second):
+    global gameboard_size
+    global Gameboard
+    global selected_element
+    if first == second:
+        return
+    obj1 = Gameboard[first[0]][first[1]]
+    obj2 = Gameboard[second[0]][second[1]]
+    Gameboard[second[0]][second[1]] = obj1
+    Gameboard[first[0]][first[1]] = obj2
+    selected_element = (-1, -1)
+
 def check_adjacency(match_length):
     global Gameboard
     global gameboard_size
@@ -233,6 +245,14 @@ def poll_events():
             elif event.key == K_RETURN:
                 check_drop()
                 set_game_state(Game_State.animation)
+        elif event.type == MOUSEBUTTONUP:
+            if event.button == 1:
+                x,y = pygame.mouse.get_pos()
+                x = int(int(x-margin[0])/image_size)
+                y = int(int(y-margin[1])/image_size)
+                if not (x < 0 or x >= gameboard_size or y < 0 or y >= gameboard_size):
+                    swap_elements([x, y], selected_element)
+        elif event.type == QUIT:
         elif event.type == MOUSEBUTTONDOWN:
             if event.button == 1:
                 x,y = pygame.mouse.get_pos()
@@ -299,6 +319,8 @@ def main():
     random_gameboard()
     Gameboard[5][5] = None 
     while True:
+    selected_element = (-1, -1)
+    while not do_quit:
         screen.fill((0,0,0))
         draw_background()
         game_loop()
@@ -310,7 +332,7 @@ def main():
                 elif (obj is not None):
                     obj.update()
                     obj.draw(x, y)
-        if selected_element is not (-1, -1):
+        if not selected_element == (-1, -1):
             get_selected_element().draw_true(cursor_pos[0], cursor_pos[1])
         pygame.display.flip()
 
