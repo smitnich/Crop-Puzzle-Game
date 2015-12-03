@@ -17,6 +17,8 @@ Gameboard = [[0 for x in range(gameboard_size)] for x in range(gameboard_size)]
 selected_element = [-1, -1]
 background = None
 
+do_quit = False
+
 class Game_State(IntEnum):
     ready = 1
     animation = 2
@@ -236,6 +238,7 @@ def cleanup():
 def poll_events():
     global cursor_pos
     global selected_element
+    global do_quit
     for event in pygame.event.get():
         if event.type == KEYDOWN:
             if event.key == K_ESCAPE:
@@ -253,6 +256,7 @@ def poll_events():
                 if not (x < 0 or x >= gameboard_size or y < 0 or y >= gameboard_size):
                     swap_elements([x, y], selected_element)
         elif event.type == QUIT:
+            do_quit = True
         elif event.type == MOUSEBUTTONDOWN:
             if event.button == 1:
                 x,y = pygame.mouse.get_pos()
@@ -318,7 +322,7 @@ def main():
     create_objects()
     random_gameboard()
     Gameboard[5][5] = None 
-    while True:
+    Gameboard[5][5] = None
     selected_element = (-1, -1)
     while not do_quit:
         screen.fill((0,0,0))
@@ -335,5 +339,7 @@ def main():
         if not selected_element == (-1, -1):
             get_selected_element().draw_true(cursor_pos[0], cursor_pos[1])
         pygame.display.flip()
+    pygame.display.quit()
+    
 
 main()
