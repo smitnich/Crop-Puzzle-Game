@@ -11,7 +11,7 @@ image_size = 48
 
 margin = (64, 64)
 match_length = 3
-sprite_paths = ['gfx/fire.png', 'gfx/ice.png', 'gfx/boulder.png']
+sprite_paths = ['gfx/fire.png', 'gfx/ice.png', 'gfx/boulder.png', 'gfx/robot.png']
 image_cache = []
 Gameboard = [[0 for x in range(gameboard_size)] for x in range(gameboard_size)] 
 selected_element = [-1, -1]
@@ -151,7 +151,8 @@ def create_objects():
     obj1 = Element(0)
     obj2 = Element(1)
     obj3 = Element(2)
-    all_objects = [obj1, obj2, obj3]
+    obj4 = Element(3)
+    all_objects = [obj1, obj2, obj3, obj4]
 
 def swap_elements(first, second):
     global gameboard_size
