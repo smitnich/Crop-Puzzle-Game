@@ -43,7 +43,7 @@ class Element:
         global margin
         if self.moving:
             x = x*image_size+margin[0]
-            y = y*image_size+int(anim_progress)+margin[1]
+            y = (y-1)*image_size+int(anim_progress)+margin[1]
         else:
             x = x*image_size+margin[0]
             y = y*image_size+margin[1]
@@ -124,21 +124,7 @@ def check_drop():
                     newobj = random_object()
                     move_element(newobj, x, 0)
     return drop_found
-    
-def drop_column(x, y, count):
-    global gameboard_size
-    if x < 0 or y < 0 or x > gameboard_size or y > gameboard_size:
-        return
-    for i in range(0,count):
-        delete_object(x,y+i)
-    if Gameboard[x][y] is not None:
-        return
-    for i in range(y-1, -count, -1):
-        move_element(Gameboard[x][i],x,i+count)
-        delete_object(x,i)
-    add_elements()
-    set_game_state(Game_State.animation)
-            
+
 def delete_object(x,y):
     global Gameboard
     global gameboard_size
@@ -240,6 +226,7 @@ def poll_events():
     global cursor_pos
     global selected_element
     global do_quit
+    global match_length
     for event in pygame.event.get():
         if event.type == KEYDOWN:
             if event.key == K_ESCAPE:
@@ -256,6 +243,7 @@ def poll_events():
                 y = int(int(y-margin[1])/image_size)
                 if not (x < 0 or x >= gameboard_size or y < 0 or y >= gameboard_size):
                     swap_elements([x, y], selected_element)
+                update_board()
         elif event.type == QUIT:
             do_quit = True
         elif event.type == MOUSEBUTTONDOWN:
@@ -267,6 +255,10 @@ def poll_events():
                     selected_element = [x, y]
         elif event.type == MOUSEMOTION:
             cursor_pos = pygame.mouse.get_pos()
+
+def update_board():
+    global game_state
+    game_state = Game_State.update
 
 def load_images():
     global image_cache
@@ -280,11 +272,20 @@ def load_images():
         img.set_colorkey(transparent)
     background = pygame.image.load("gfx/background.jpg")
 
+def stop_moving():
+    global Gameboard
+    for row in Gameboard:
+        for obj in row:
+            if obj is not None:
+                obj.moving = False
+
 def do_animations():
     global anim_progress
-    anim_progress += 2
+    global match_length
+    anim_progress += 4
     if anim_progress >= image_size:
         anim_progress = 0.0
+        stop_moving()
         set_game_state(Game_State.update)
 
 def game_loop():
@@ -318,12 +319,11 @@ def main():
     global screen
     global cursor_pos
     global selected_element
+    global do_quit
     screen = pygame.display.set_mode((1024, 768))
     load_images()
     create_objects()
     random_gameboard()
-    Gameboard[5][5] = None 
-    Gameboard[5][5] = None
     selected_element = (-1, -1)
     while not do_quit:
         screen.fill((0,0,0))
@@ -342,5 +342,4 @@ def main():
         pygame.display.flip()
     pygame.display.quit()
     
-
 main()
