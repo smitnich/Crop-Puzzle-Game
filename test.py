@@ -175,7 +175,10 @@ def check_adjacency(match_length):
             new_req = Delete_Request(x, gameboard_size-match_count, 0, match_count)
             delete_requests.append(new_req)
 
-    delete_requests.extend(check_horiz_adjacency(match_length))
+    horiz_matches = check_horiz_adjacency(match_length)
+    if len(horiz_matches) > 0:
+        match_found = True
+    delete_requests.extend(horiz_matches)
     
     for request in delete_requests:
         request.delete()
