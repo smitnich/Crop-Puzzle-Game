@@ -1,3 +1,6 @@
+import Score
+import Globals
+
 gameboard_size = 10
 Gameboard = [[0 for x in range(gameboard_size)] for x in range(gameboard_size)]
 
@@ -13,6 +16,7 @@ class Delete_Request:
         self.y_length = _y_length
 
     def delete(self):
+        Score.Add_Match(self.x_length + self.y_length)
         if self.x_length > 0:
             for i in range(0, self.x_length):
                 delete_object(self.x+i, self.y)
@@ -33,20 +37,20 @@ def move_element(obj, x, y):
         obj.moving = True
 
 def random_gameboard():
-    import main
+    from main import random_object
     global gameboard_size
     global Gameboard
     global image_size
     for x in range (0, gameboard_size):
         for y in range (0, gameboard_size):
-            obj = main.random_object()
+            obj = random_object()
             Gameboard[x][y] = obj
-            obj.x = x*main.image_size
-            obj.y = y*main.image_size
+            obj.x = x*Globals.image_size
+            obj.y = y*Globals.image_size
 
 #Check for any elements that have an empty space below them
 def check_drop():
-    import main
+    from main import random_object
     global gameboard
     global gameboard_size
     drop_found = False
@@ -58,7 +62,7 @@ def check_drop():
             obj = Gameboard[x][y]
             if obj is None:
                 if y is 0:
-                    newobj = main.random_object()
+                    newobj = random_object()
                     move_element(newobj, x, 0)
                     drop_found = True
                 continue
@@ -67,7 +71,7 @@ def check_drop():
                 move_element(obj, x, y+1)
                 Gameboard[x][y] = None
                 if y is 0:
-                    newobj = main.random_object()
+                    newobj = random_object()
                     move_element(newobj, x, 0)
     return drop_found
 
@@ -82,14 +86,13 @@ def swap_elements(first, second):
     global gameboard_size
     global Gameboard
     global selected_element
-    import main
     if first == second:
         return
     obj1 = Gameboard[first[0]][first[1]]
     obj2 = Gameboard[second[0]][second[1]]
     Gameboard[second[0]][second[1]] = obj1
     Gameboard[first[0]][first[1]] = obj2
-    main.selected_element = (-1, -1)
+    selected_element = (-1, -1)
 
 def check_adjacency(match_length):
     global Gameboard
@@ -134,6 +137,7 @@ def get_element_index(x,y):
 def check_horiz_adjacency(match_length):
     global Gameboard
     global gameboard_size
+    global match_found
     match_found = False
     delete_requests = []
     for y in range(0, gameboard_size):
