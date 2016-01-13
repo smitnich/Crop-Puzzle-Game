@@ -4,7 +4,7 @@ import sys
 import Score
 import TextHandler
 from pygame.locals import *
-import gameboard
+import Gameboard
 import Globals
 
 from enum import IntEnum
@@ -64,9 +64,9 @@ def poll_events():
             if event.key == K_ESCAPE:
                 cleanup()
             elif event.key == K_SPACE:
-                gameboard.check_adjacency(3)
+                Gameboard.check_adjacency(3)
             elif event.key == K_RETURN:
-                gameboard.check_drop()
+                Gameboard.check_drop()
                 set_game_state(Globals.Game_State.animation)
         elif event.type == MOUSEBUTTONUP:
             if event.button == 1:
@@ -76,8 +76,8 @@ def poll_events():
                 if Globals.selected_element[0] == x and Globals.selected_element[1] == y:
                     Globals.selected_element = (-1, -1)
                     continue
-                if not (x < 0 or x >= gameboard.gameboard_size or y < 0 or y >= gameboard.gameboard_size):
-                    gameboard.swap_elements([x, y], Globals.selected_element)
+                if not (x < 0 or x >= Gameboard.Gameboard_size or y < 0 or y >= Gameboard.Gameboard_size):
+                    Gameboard.swap_elements([x, y], Globals.selected_element)
                 update_board()
                 Globals.selected_element = (-1, -1)
         elif event.type == QUIT:
@@ -87,7 +87,7 @@ def poll_events():
                 x,y = pygame.mouse.get_pos()
                 x = int(int(x-margin[0])/image_size)
                 y = int(int(y-margin[1])/image_size)
-                if not (x < 0 or x >= gameboard.gameboard_size or y < 0 or y >= gameboard.gameboard_size):
+                if not (x < 0 or x >= Gameboard.Gameboard_size or y < 0 or y >= Gameboard.Gameboard_size):
                     Globals.selected_element = [x, y]
         elif event.type == MOUSEMOTION:
             cursor_pos = pygame.mouse.get_pos()
@@ -105,7 +105,7 @@ def load_images():
     Globals.background = pygame.image.load("gfx/background.jpg")
 
 def stop_moving():
-    for row in gameboard.Gameboard:
+    for row in Gameboard.Gameboard:
         for obj in row:
             if obj is not None:
                 obj.moving = False
@@ -123,9 +123,9 @@ def game_loop():
     elif Globals.game_state == Globals.Game_State.animation:
         do_animations()
     elif Globals.game_state == Globals.Game_State.update:
-        if gameboard.check_drop():
+        if Gameboard.check_drop():
             set_game_state(Globals.Game_State.animation)
-        elif not gameboard.check_adjacency(Globals.match_length):
+        elif not Gameboard.check_adjacency(Globals.match_length):
             set_game_state(Globals.Game_State.ready)
 
 def set_game_state(new_state):
@@ -134,18 +134,18 @@ def set_game_state(new_state):
     Globals.game_state = new_state
 
 def get_selected_element():
-    return gameboard.Gameboard[Globals.selected_element[0]][Globals.selected_element[1]]
+    return Gameboard.Gameboard[Globals.selected_element[0]][Globals.selected_element[1]]
 
 def draw_background():
     Globals.screen.blit(Globals.background, (0, 0))
 
 def draw_score():
     score = Score.Get_Score()
-    x_off = Globals.margin[0]*2 + Globals.image_size*gameboard.gameboard_size
+    x_off = Globals.margin[0]*2 + Globals.image_size*Gameboard.Gameboard_size
     y_off = Globals.margin[1]
     TextHandler.RenderText(str(score), x_off, y_off)
 
-def main():
+def Main():
     if __name__ != "__main__":
         return
     global cursor_pos
@@ -154,16 +154,16 @@ def main():
     TextHandler.Init()
     load_images()
     create_objects()
-    gameboard.random_gameboard()
+    Gameboard.random_Gameboard()
     Score.Reset_Score()
     Globals.selected_element = (-1, -1)
     while not Globals.do_quit:
         Globals.screen.fill((0,0,0))
         draw_background()
         game_loop()
-        for x in range(0, gameboard.gameboard_size):
-            for y in range(0, gameboard.gameboard_size):
-                obj = gameboard.Gameboard[x][y]
+        for x in range(0, Gameboard.Gameboard_size):
+            for y in range(0, Gameboard.Gameboard_size):
+                obj = Gameboard.Gameboard[x][y]
                 if Globals.selected_element == [x, y]:
                     continue
                 elif (obj is not None):
@@ -177,4 +177,4 @@ def main():
         pygame.display.flip()
     pygame.display.quit()
     
-main()
+Main()

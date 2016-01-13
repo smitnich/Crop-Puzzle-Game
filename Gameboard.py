@@ -1,8 +1,8 @@
 import Score
 import Globals
 
-gameboard_size = 10
-Gameboard = [[0 for x in range(gameboard_size)] for x in range(gameboard_size)]
+Gameboard_size = 10
+Gameboard = [[0 for x in range(Gameboard_size)] for x in range(Gameboard_size)]
 
 class Delete_Request:
     x = 0
@@ -26,8 +26,8 @@ class Delete_Request:
 
 
 def move_element(obj, x, y):
-    global gameboard_size
-    if (x < 0) or (y < 0) or x > (gameboard_size) or (y > gameboard_size):
+    global Gameboard_size
+    if (x < 0) or (y < 0) or x > (Gameboard_size) or (y > Gameboard_size):
         return
     if Gameboard[x][y] is not None:
         print(x,y," is not None")
@@ -36,13 +36,13 @@ def move_element(obj, x, y):
     if obj is not None:
         obj.moving = True
 
-def random_gameboard():
-    from main import random_object
-    global gameboard_size
+def random_Gameboard():
+    from Main import random_object
+    global Gameboard_size
     global Gameboard
     global image_size
-    for x in range (0, gameboard_size):
-        for y in range (0, gameboard_size):
+    for x in range (0, Gameboard_size):
+        for y in range (0, Gameboard_size):
             obj = random_object()
             Gameboard[x][y] = obj
             obj.x = x*Globals.image_size
@@ -50,15 +50,15 @@ def random_gameboard():
 
 #Check for any elements that have an empty space below them
 def check_drop():
-    from main import random_object
-    global gameboard
-    global gameboard_size
+    from Main import random_object
+    global Gameboard
+    global Gameboard_size
     drop_found = False
-    for tmpy in range(2, gameboard_size+1):
+    for tmpy in range(2, Gameboard_size+1):
         #Start at the bottom so that elements above will
         #drop down when the ones below them do so
-        y = gameboard_size - tmpy
-        for x in range(0, gameboard_size):
+        y = Gameboard_size - tmpy
+        for x in range(0, Gameboard_size):
             obj = Gameboard[x][y]
             if obj is None:
                 if y is 0:
@@ -77,13 +77,13 @@ def check_drop():
 
 def delete_object(x,y):
     global Gameboard
-    global gameboard_size
-    if (x > gameboard_size or y > gameboard_size or x < 0 or y < 0):
+    global Gameboard_size
+    if (x > Gameboard_size or y > Gameboard_size or x < 0 or y < 0):
         return
     Gameboard[x][y] = None
 
 def swap_elements(first, second):
-    global gameboard_size
+    global Gameboard_size
     global Gameboard
     global selected_element
     if first == second:
@@ -96,13 +96,13 @@ def swap_elements(first, second):
 
 def check_adjacency(match_length):
     global Gameboard
-    global gameboard_size
+    global Gameboard_size
     match_found = False
     delete_requests = []
-    for x in range(0, gameboard_size):
+    for x in range(0, Gameboard_size):
         match_count = 0
         to_match = get_element_index(x,0)
-        for y in range(0, gameboard_size):
+        for y in range(0, Gameboard_size):
             if get_element_index(x,y) == to_match and to_match is not -1:
                 match_count = match_count+1
             else:
@@ -114,7 +114,7 @@ def check_adjacency(match_length):
             to_match = get_element_index(x,y)
         if match_count >= match_length:
             match_found = True
-            new_req = Delete_Request(x, gameboard_size-match_count, 0, match_count)
+            new_req = Delete_Request(x, Gameboard_size-match_count, 0, match_count)
             delete_requests.append(new_req)
 
     horiz_matches = check_horiz_adjacency(match_length)
@@ -136,14 +136,14 @@ def get_element_index(x,y):
 
 def check_horiz_adjacency(match_length):
     global Gameboard
-    global gameboard_size
+    global Gameboard_size
     global match_found
     match_found = False
     delete_requests = []
-    for y in range(0, gameboard_size):
+    for y in range(0, Gameboard_size):
         match_count = 0
         to_match = get_element_index(0,y)
-        for x in range(0, gameboard_size):
+        for x in range(0, Gameboard_size):
             if get_element_index(x,y) == to_match and to_match is not -1:
                 match_count = match_count+1
             else:
@@ -155,7 +155,7 @@ def check_horiz_adjacency(match_length):
             to_match = get_element_index(x,y)
         if match_count >= match_length:
             match_found = True
-            new_req = Delete_Request(gameboard_size-match_count, y, match_count, 0)
+            new_req = Delete_Request(Gameboard_size-match_count, y, match_count, 0)
             delete_requests.append(new_req)
 
     return delete_requests
