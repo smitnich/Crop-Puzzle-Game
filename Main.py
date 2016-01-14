@@ -37,6 +37,11 @@ class Element:
     def draw_true(self, x, y):
         Globals.screen.blit(self.sprite, (x-Globals.image_size/2, y-Globals.image_size/2))
 
+    def draw_box(self, pos):
+        image_size = Globals.image_size
+        rectangle = (pos[0]*image_size+Globals.margin[0], pos[1]*image_size+Globals.margin[1], image_size, image_size)
+        pygame.draw.rect(Globals.screen, (255, 255, 255), rectangle, 1)
+
     def update(self):
         if Globals.game_state is not Globals.Game_State.animation:
             self.moving = False
@@ -55,6 +60,9 @@ def cleanup():
     pygame.display.quit()
     sys.exit()
 
+def coord_distance(coord1, coord2):
+    return abs(coord1[0]-coord2[0])+abs(coord1[1] - coord2[1])
+
 def poll_events():
     global cursor_pos
     margin = Globals.margin
@@ -68,18 +76,6 @@ def poll_events():
             elif event.key == K_RETURN:
                 Gameboard.check_drop()
                 set_game_state(Globals.Game_State.animation)
-        elif event.type == MOUSEBUTTONUP:
-            if event.button == 1:
-                x,y = pygame.mouse.get_pos()
-                x = int(int(x-margin[0])/image_size)
-                y = int(int(y-margin[1])/image_size)
-                if Globals.selected_element[0] == x and Globals.selected_element[1] == y:
-                    Globals.selected_element = (-1, -1)
-                    continue
-                if not (x < 0 or x >= Gameboard.Gameboard_size or y < 0 or y >= Gameboard.Gameboard_size):
-                    Gameboard.swap_elements([x, y], Globals.selected_element)
-                update_board()
-                Globals.selected_element = (-1, -1)
         elif event.type == QUIT:
             Globals.do_quit = True
         elif event.type == MOUSEBUTTONDOWN:
@@ -88,7 +84,14 @@ def poll_events():
                 x = int(int(x-margin[0])/image_size)
                 y = int(int(y-margin[1])/image_size)
                 if not (x < 0 or x >= Gameboard.Gameboard_size or y < 0 or y >= Gameboard.Gameboard_size):
-                    Globals.selected_element = [x, y]
+                    if (Globals.selected_element == [x, y]):
+                        Globals.selected_element = (-1, -1)
+                    elif Globals.selected_element == (-1, -1):
+                        Globals.selected_element = [x, y]
+                    else:
+                        if coord_distance(Globals.selected_element, [x, y]) <= 1:
+                            Gameboard.swap_elements(Globals.selected_element, [x, y])
+                        Globals.selected_element = (-1, -1)
         elif event.type == MOUSEMOTION:
             cursor_pos = pygame.mouse.get_pos()
 
@@ -163,16 +166,14 @@ def Main():
         game_loop()
         for x in range(0, Gameboard.Gameboard_size):
             for y in range(0, Gameboard.Gameboard_size):
-                obj = Gameboard.Gameboard[x][y]
-                if Globals.selected_element == [x, y]:
-                    continue
-                elif (obj is not None):
+                obj = Gameboard.Gameboard[x][y]                    
+                if (obj is not None):
                     obj.update()
                     obj.draw(x, y)
         if not Globals.selected_element == (-1, -1):
             element = get_selected_element()
             if element is not None:
-                element.draw_true(cursor_pos[0], cursor_pos[1])
+                element.draw_box(Globals.selected_element)
         draw_score()
         pygame.display.flip()
     pygame.display.quit()
