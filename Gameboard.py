@@ -1,5 +1,6 @@
 import Score
 import Globals
+import sys
 
 Gameboard_size = 10
 Gameboard = [[0 for x in range(Gameboard_size)] for x in range(Gameboard_size)]
@@ -24,6 +25,55 @@ class Delete_Request:
             for i in range(0, self.y_length):
                 delete_object(self.x, self.y+i)
 
+def check_max_count(in_list):
+    max_count = 0
+    max_id = -1
+    ids = list(o.index for o in in_list)
+    for i in range(0, len(Globals.all_objects)):
+        count = ids.count(i)
+        if count > max_count:
+            max_count = count
+            max_id = i
+    return max_count, max_id
+
+def check_swap(x, y, id, length):
+    for i in range(0, length):
+        obj = Gameboard[x+i][y]
+        if (obj.index != id):
+            ##Check left of the first element
+            if i == 0 and x > 1 and Gameboard[x-1][y].index == id:
+                Gameboard[x-1][y].highlighted = True
+                return True, x+i-1, y
+            elif y > 0 and Gameboard[x+i][y-1].index == id:
+                Gameboard[x+i][y-1].highlighted = True
+                return True, x+i, y-1
+            elif y < Gameboard_size and Gameboard[x+i][y+1].index == id:
+                Gameboard[x+i][y+1].highlighted = True
+                return True, x+i, y+1
+            elif i == length-1 and x + i < Gameboard_size and Gameboard[x+i+1][y].index == id:
+                Gameboard[x+i+1][y].highlighted = True
+                return True, x+i+1, y
+    return False, -1, -1 
+
+def check_availible_moves():
+    try:
+        global Gameboard_size
+        match_length = Globals.match_length
+        offset = match_length - 1
+        for y in range(0, Gameboard_size):
+            l = list((Gameboard[0][y], Gameboard[1][y]))
+            for x in range(offset, Gameboard_size-match_length-1):
+                l.append(Gameboard[x][y])
+                max_count, id = check_max_count(l)
+                if (max_count == match_length - 1):
+                    res, xPos, yPos = check_swap(x-offset, y, id, match_length)
+                    if res:
+                        print("Swap possible: ", xPos, yPos)
+                        return True
+                l.pop(0)
+    except:
+        print("Unexpected error:", sys.exc_info()[0])
+
 
 def move_element(obj, x, y):
     global Gameboard_size
@@ -45,8 +95,6 @@ def random_Gameboard():
         for y in range (0, Gameboard_size):
             obj = random_object()
             Gameboard[x][y] = obj
-            obj.x = x*Globals.image_size
-            obj.y = y*Globals.image_size
 
 #Check for any elements that have an empty space below them
 def check_drop():

@@ -19,6 +19,7 @@ class Element:
     index = 0
     moving = False
     sprite = None
+    highlighted = False
     def __init__(self, _index):
         self.index = _index
         self.sprite = Globals.image_cache[self.index]
@@ -26,6 +27,8 @@ class Element:
     def draw(self,x,y):
         margin = Globals.margin
         image_size = Globals.image_size
+        trueX = x
+        trueY = y
         if self.moving:
             x = x*image_size+margin[0]
             y = (y-1)*image_size+int(Globals.anim_progress)+margin[1]
@@ -33,6 +36,8 @@ class Element:
             x = x*image_size+margin[0]
             y = y*image_size+margin[1]
         Globals.screen.blit(self.sprite,(x,y))
+        if self.highlighted:
+            self.draw_box((trueX, trueY))
 
     def draw_true(self, x, y):
         Globals.screen.blit(self.sprite, (x-Globals.image_size/2, y-Globals.image_size/2))
@@ -160,6 +165,7 @@ def Main():
     Gameboard.random_Gameboard()
     Score.Reset_Score()
     Globals.selected_element = (-1, -1)
+    Gameboard.check_availible_moves()
     while not Globals.do_quit:
         Globals.screen.fill((0,0,0))
         draw_background()
