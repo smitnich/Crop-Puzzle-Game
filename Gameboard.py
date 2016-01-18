@@ -20,10 +20,10 @@ class Delete_Request:
         Score.Add_Match(self.x_length + self.y_length)
         if self.x_length > 0:
             for i in range(0, self.x_length):
-                delete_object(self.x+i, self.y)
+                delete_object(self.x + i, self.y)
         elif self.y_length > 0:
             for i in range(0, self.y_length):
-                delete_object(self.x, self.y+i)
+                delete_object(self.x, self.y + i)
 
 def check_max_count(in_list):
     max_count = 0
@@ -36,23 +36,42 @@ def check_max_count(in_list):
             max_id = i
     return max_count, max_id
 
-def check_swap(x, y, id, length):
+def check_swap_horiz(x, y, id, length):
     for i in range(0, length):
-        obj = Gameboard[x+i][y]
+        obj = Gameboard[x + i][y]
         if (obj.index != id):
             ##Check left of the first element
-            if i == 0 and x > 0 and Gameboard[x-1][y].index == id:
-                Gameboard[x-1][y].highlighted = True
-            ##    return True, x+i-1, y
-            elif y > 0 and x + i < Gameboard_size and Gameboard[x+i][y-1].index == id:
-                Gameboard[x+i][y-1].highlighted = True
-            ##    return True, x+i, y-1
-            elif y + 1 < Gameboard_size and x + i < Gameboard_size and Gameboard[x+i][y+1].index == id:
-                Gameboard[x+i][y+1].highlighted = True
-            ##    return True, x+i, y+1
-            elif i == length-1 and x + i + 1 < Gameboard_size and Gameboard[x+i+1][y].index == id:
-                Gameboard[x+i+1][y].highlighted = True
-            ##    return True, x+i+1, y
+            if i == 0 and x > 0 and Gameboard[x - 1][y].index == id:
+                Gameboard[x - 1][y].highlighted = True
+                ##return True, x+i-1, y
+            elif y > 0 and x + i < Gameboard_size and Gameboard[x + i][y - 1].index == id:
+                Gameboard[x + i][y - 1].highlighted = True
+                ##return True, x+i, y-1
+            elif y + 1 < Gameboard_size and x + i < Gameboard_size and Gameboard[x + i][y + 1].index == id:
+                Gameboard[x + i][y + 1].highlighted = True
+                ##return True, x+i, y+1
+            elif i == length - 1 and x + i + 1 < Gameboard_size and Gameboard[x + i + 1][y].index == id:
+                Gameboard[x + i + 1][y].highlighted = True
+                ##return True, x+i+1, y
+    return False, -1, -1 
+
+def check_swap_vert(x, y, id, length):
+    for i in range(0, length):
+        obj = Gameboard[x][y + i]
+        if (obj.index != id):
+            ##Check above the first element
+            if i == 0 and y > 0 and Gameboard[x][y - 1].index == id:
+                Gameboard[x][y - 1].highlighted = True
+                return True, x, y-1
+            elif x > 0 and y + i < Gameboard_size and Gameboard[x - 1][y + i].index == id:
+                Gameboard[x - 1][y + i].highlighted = True
+                return True, x+i, y-1
+            elif x + 1 < Gameboard_size and y + i < Gameboard_size and Gameboard[x + 1][y + i].index == id:
+                Gameboard[x + 1][y + i].highlighted = True
+                return True, x+i, y+1
+            elif i == length - 1 and y + i + 1 < Gameboard_size and Gameboard[x][y + i + 1].index == id:
+                Gameboard[x][y + i + 1].highlighted = True
+                return True, x+i+1, y
     return False, -1, -1 
 
 def check_availible_moves():
@@ -60,17 +79,33 @@ def check_availible_moves():
         global Gameboard_size
         match_length = Globals.match_length
         offset = match_length - 1
+        ##Check if it is possible to make a horizontal line by moving one tile
         for y in range(0, Gameboard_size):
+            break
             l = list((Gameboard[0][y], Gameboard[1][y]))
             for x in range(offset, Gameboard_size):
                 l.append(Gameboard[x][y])
                 max_count, id = check_max_count(l)
                 if (max_count == match_length - 1):
-                    res, xPos, yPos = check_swap(x-offset, y, id, match_length)
+                    res, xPos, yPos = check_swap_horiz(x - offset, y, id, match_length)
                     if res:
                         print("Swap possible: ", xPos, yPos)
                         return True
                 l.pop(0)
+
+        ##Check if it possible to make a vertical line by moving one tile
+        for x in range(0, Gameboard_size):
+            l = list((Gameboard[x][0], Gameboard[x][1]))
+            for y in range(offset, Gameboard_size):
+                l.append(Gameboard[x][y])
+                max_count, id = check_max_count(l)
+                if (max_count == match_length - 1):
+                    res, xPos, yPos = check_swap_vert(x , y - offset, id, match_length)
+                    if res:
+                        print("Swap possible: ", xPos, yPos)
+                        return True
+                l.pop(0)
+
     except:
         print("Unexpected error:", sys.exc_info()[0])
 
@@ -91,8 +126,8 @@ def random_Gameboard():
     global Gameboard_size
     global Gameboard
     global image_size
-    for x in range (0, Gameboard_size):
-        for y in range (0, Gameboard_size):
+    for x in range(0, Gameboard_size):
+        for y in range(0, Gameboard_size):
             obj = random_object()
             Gameboard[x][y] = obj
 
@@ -102,7 +137,7 @@ def check_drop():
     global Gameboard
     global Gameboard_size
     drop_found = False
-    for tmpy in range(2, Gameboard_size+1):
+    for tmpy in range(2, Gameboard_size + 1):
         #Start at the bottom so that elements above will
         #drop down when the ones below them do so
         y = Gameboard_size - tmpy
@@ -114,9 +149,9 @@ def check_drop():
                     move_element(newobj, x, 0)
                     drop_found = True
                 continue
-            if Gameboard[x][y+1] is None:
+            if Gameboard[x][y + 1] is None:
                 drop_found = True
-                move_element(obj, x, y+1)
+                move_element(obj, x, y + 1)
                 Gameboard[x][y] = None
                 if y is 0:
                     newobj = random_object()
@@ -152,17 +187,17 @@ def check_adjacency(match_length):
         to_match = get_element_index(x,0)
         for y in range(0, Gameboard_size):
             if get_element_index(x,y) == to_match and to_match is not -1:
-                match_count = match_count+1
+                match_count = match_count + 1
             else:
                 if match_count >= match_length:
                     match_found = True
-                    new_req = Delete_Request(x, y-match_count, 0, match_count)
+                    new_req = Delete_Request(x, y - match_count, 0, match_count)
                     delete_requests.append(new_req)
                 match_count = 1
             to_match = get_element_index(x,y)
         if match_count >= match_length:
             match_found = True
-            new_req = Delete_Request(x, Gameboard_size-match_count, 0, match_count)
+            new_req = Delete_Request(x, Gameboard_size - match_count, 0, match_count)
             delete_requests.append(new_req)
 
     horiz_matches = check_horiz_adjacency(match_length)
@@ -193,17 +228,17 @@ def check_horiz_adjacency(match_length):
         to_match = get_element_index(0,y)
         for x in range(0, Gameboard_size):
             if get_element_index(x,y) == to_match and to_match is not -1:
-                match_count = match_count+1
+                match_count = match_count + 1
             else:
                 if match_count >= match_length:
                     match_found = True
-                    new_req = Delete_Request(x-match_count, y, match_count, 0)
+                    new_req = Delete_Request(x - match_count, y, match_count, 0)
                     delete_requests.append(new_req)
                 match_count = 1
             to_match = get_element_index(x,y)
         if match_count >= match_length:
             match_found = True
-            new_req = Delete_Request(Gameboard_size-match_count, y, match_count, 0)
+            new_req = Delete_Request(Gameboard_size - match_count, y, match_count, 0)
             delete_requests.append(new_req)
 
     return delete_requests
