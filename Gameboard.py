@@ -41,18 +41,18 @@ def check_swap(x, y, id, length):
         obj = Gameboard[x+i][y]
         if (obj.index != id):
             ##Check left of the first element
-            if i == 0 and x > 1 and Gameboard[x-1][y].index == id:
+            if i == 0 and x > 0 and Gameboard[x-1][y].index == id:
                 Gameboard[x-1][y].highlighted = True
-                return True, x+i-1, y
-            elif y > 0 and Gameboard[x+i][y-1].index == id:
+            ##    return True, x+i-1, y
+            elif y > 0 and x + i < Gameboard_size and Gameboard[x+i][y-1].index == id:
                 Gameboard[x+i][y-1].highlighted = True
-                return True, x+i, y-1
-            elif y < Gameboard_size and Gameboard[x+i][y+1].index == id:
+            ##    return True, x+i, y-1
+            elif y + 1 < Gameboard_size and x + i < Gameboard_size and Gameboard[x+i][y+1].index == id:
                 Gameboard[x+i][y+1].highlighted = True
-                return True, x+i, y+1
-            elif i == length-1 and x + i < Gameboard_size and Gameboard[x+i+1][y].index == id:
+            ##    return True, x+i, y+1
+            elif i == length-1 and x + i + 1 < Gameboard_size and Gameboard[x+i+1][y].index == id:
                 Gameboard[x+i+1][y].highlighted = True
-                return True, x+i+1, y
+            ##    return True, x+i+1, y
     return False, -1, -1 
 
 def check_availible_moves():
@@ -62,7 +62,7 @@ def check_availible_moves():
         offset = match_length - 1
         for y in range(0, Gameboard_size):
             l = list((Gameboard[0][y], Gameboard[1][y]))
-            for x in range(offset, Gameboard_size-match_length-1):
+            for x in range(offset, Gameboard_size):
                 l.append(Gameboard[x][y])
                 max_count, id = check_max_count(l)
                 if (max_count == match_length - 1):
