@@ -1,6 +1,7 @@
 import Score
 import Globals
 import sys
+import random
 
 Gameboard_size = 10
 Gameboard = [[0 for x in range(Gameboard_size)] for x in range(Gameboard_size)]
@@ -89,7 +90,6 @@ def check_availible_moves():
                 if (max_count == match_length - 1):
                     res, xPos, yPos = check_swap_horiz(x - offset, y, id, match_length)
                     if res:
-                        print("Swap possible: ", xPos, yPos)
                         return True
                 l.pop(0)
 
@@ -130,6 +130,9 @@ def random_Gameboard():
         for y in range(0, Gameboard_size):
             obj = random_object()
             Gameboard[x][y] = obj
+    ## Don't let any matches exist when the board is created
+    check_adjacency(3)
+    fill_empty_spaces(3)
 
 #Check for any elements that have an empty space below them
 def check_drop():
@@ -209,13 +212,59 @@ def check_adjacency(match_length):
         request.delete()
     return match_found
 
+## Check if placing an object with this index at location x, y would lead to a new match
+## being created
+def check_adjacent_count(index, x, y, match_length):
+    c = 0
+    c_max = 0
+    ## The distance we need to check in each direction
+    l = match_length - 1
+
+    for i in range(max(0, x - l), min(Gameboard_size, x + l)):
+        if (Gameboard[i][y] == index):
+            c = c + 1
+        else:
+            if c > c_max:
+                c_max = c
+            c = 0
+    if c > c_max:
+        c_max = c
+
+    c = 0
+
+    for i in range(max(0, y - l), min(Gameboard_size, y + l)):
+        if (Gameboard[x][i] == index):
+            c = c + 1
+        else:
+            if c > c_max:
+                c_max = c
+            c = 0
+    if c > c_max:
+        c_max = c
+    return c_max
+
+def fill_empty_space(match_length, x, y):
+    from Main import make_element
+    random_order = list(range(0, len(Globals.sprite_paths)))
+    random.shuffle(random_order)
+    for r in random_order:
+        if (check_adjacent_count(r, x, y, match_length) < match_length):
+            Gameboard[x][y] = make_element(r)
+            return True
+    return False
+
+def fill_empty_spaces(match_length):
+    for x in range(0, Gameboard_size):
+        for y in range(0, Gameboard_size):
+            if Gameboard[x][y] is None:
+                fill_empty_space(match_length, x, y)
+
 def get_element_index(x,y):
     obj = Gameboard[x][y]
     if obj is None:
         return -1
     else:
         return obj.index
-
 
 def check_horiz_adjacency(match_length):
     global Gameboard

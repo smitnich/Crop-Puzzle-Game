@@ -51,6 +51,9 @@ class Element:
         if Globals.game_state is not Globals.Game_State.animation:
             self.moving = False
 
+def make_element(index):
+    return Element(index)
+
 def create_objects():
     obj1 = Element(0)
     obj2 = Element(1)
@@ -96,6 +99,9 @@ def poll_events():
                     else:
                         if coord_distance(Globals.selected_element, [x, y]) <= 1:
                             Gameboard.swap_elements(Globals.selected_element, [x, y])
+                            Gameboard.check_adjacency(3)
+                            Gameboard.check_drop()
+                            set_game_state(Globals.Game_State.animation)
                         Globals.selected_element = (-1, -1)
         elif event.type == MOUSEMOTION:
             cursor_pos = pygame.mouse.get_pos()
