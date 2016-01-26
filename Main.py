@@ -141,6 +141,7 @@ def game_loop():
             set_game_state(Globals.Game_State.animation)
         elif not Gameboard.check_adjacency(Globals.match_length):
             set_game_state(Globals.Game_State.ready)
+            Score.Reset_Combo()
 
 def set_game_state(new_state):
     if new_state < 0 or new_state >= Globals.Game_State.last_state:
@@ -157,7 +158,13 @@ def draw_score():
     score = Score.Get_Score()
     x_off = Globals.margin[0]*2 + Globals.image_size*Gameboard.Gameboard_size
     y_off = Globals.margin[1]
-    TextHandler.RenderText(str(score), x_off, y_off)
+    TextHandler.RenderScore(str(score), x_off, y_off)
+    combo = Score.Get_Combo()
+    x_off = Globals.margin[0]*2 + Globals.image_size*Gameboard.Gameboard_size
+    y_off = Globals.margin[1]*2
+    TextHandler.RenderCombo(("Multiplier: " + str(combo)), x_off, y_off)
+    Globals.update_score = False
+
 
 def Main():
     if __name__ != "__main__":
@@ -165,6 +172,7 @@ def Main():
     global cursor_pos
     Globals.init()
     Globals.screen = pygame.display.set_mode((1024, 768))
+    random.seed(0)
     TextHandler.Init()
     load_images()
     create_objects()
