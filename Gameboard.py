@@ -102,7 +102,6 @@ def check_availible_moves():
                 if (max_count == match_length - 1):
                     res, xPos, yPos = check_swap_vert(x , y - offset, id, match_length)
                     if res:
-                        print("Swap possible: ", xPos, yPos)
                         return True
                 l.pop(0)
 

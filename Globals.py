@@ -20,10 +20,10 @@ def init():
     global cursor_pos
     global game_state
     global anim_progress
-    image_size = 48
+    image_size = 32
     margin = (64, 64)
     match_length = 3
-    sprite_paths = ['gfx/fire.png', 'gfx/ice.png', 'gfx/boulder.png', 'gfx/robot.png']
+    sprite_paths = ['gfx/Eggplant.gif', 'gfx/GreenPepper.gif', 'gfx/Onion.gif', 'gfx/Potato.gif']
     image_cache = []
     all_objects = None
     selected_element = [-1, -1]

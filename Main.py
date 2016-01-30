@@ -72,9 +72,6 @@ def coord_distance(coord1, coord2):
     return abs(coord1[0]-coord2[0])+abs(coord1[1] - coord2[1])
 
 def poll_events():
-    global cursor_pos
-    margin = Globals.margin
-    image_size = Globals.image_size
     for event in pygame.event.get():
         if event.type == KEYDOWN:
             if event.key == K_ESCAPE:
@@ -120,8 +117,8 @@ def update_board():
     Globals.game_state = Game_State.update
 
 def load_images():
-    #We use pink as the transparency color currently
-    transparent = (255, 0, 220)
+    #We use light gray as the transparency color currently
+    transparent = (200, 200, 200)
     for path in Globals.sprite_paths:
         Globals.image_cache = Globals.image_cache + [pygame.image.load(path).convert()]
     for img in Globals.image_cache:
