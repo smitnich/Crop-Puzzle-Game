@@ -43,17 +43,13 @@ def check_swap_horiz(x, y, id, length):
         if (obj.index != id):
             ##Check left of the first element
             if i == 0 and x > 0 and Gameboard[x - 1][y].index == id:
-                Gameboard[x - 1][y].highlighted = True
-                ##return True, x+i-1, y
+                return True, x+i-1, y
             elif y > 0 and x + i < Gameboard_size and Gameboard[x + i][y - 1].index == id:
-                Gameboard[x + i][y - 1].highlighted = True
-                ##return True, x+i, y-1
+                return True, x+i, y-1
             elif y + 1 < Gameboard_size and x + i < Gameboard_size and Gameboard[x + i][y + 1].index == id:
-                Gameboard[x + i][y + 1].highlighted = True
-                ##return True, x+i, y+1
+                return True, x+i, y+1
             elif i == length - 1 and x + i + 1 < Gameboard_size and Gameboard[x + i + 1][y].index == id:
-                Gameboard[x + i + 1][y].highlighted = True
-                ##return True, x+i+1, y
+                return True, x+i+1, y
     return False, -1, -1 
 
 def check_swap_vert(x, y, id, length):
@@ -62,16 +58,12 @@ def check_swap_vert(x, y, id, length):
         if (obj.index != id):
             ##Check above the first element
             if i == 0 and y > 0 and Gameboard[x][y - 1].index == id:
-                Gameboard[x][y - 1].highlighted = True
                 return True, x, y-1
             elif x > 0 and y + i < Gameboard_size and Gameboard[x - 1][y + i].index == id:
-                Gameboard[x - 1][y + i].highlighted = True
                 return True, x+i, y-1
             elif x + 1 < Gameboard_size and y + i < Gameboard_size and Gameboard[x + 1][y + i].index == id:
-                Gameboard[x + 1][y + i].highlighted = True
                 return True, x+i, y+1
             elif i == length - 1 and y + i + 1 < Gameboard_size and Gameboard[x][y + i + 1].index == id:
-                Gameboard[x][y + i + 1].highlighted = True
                 return True, x+i+1, y
     return False, -1, -1 
 
