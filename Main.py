@@ -88,23 +88,33 @@ def poll_events():
             Globals.do_quit = True
         elif event.type == MOUSEBUTTONDOWN:
             if event.button == 1:
-                x,y = pygame.mouse.get_pos()
-                x = int(int(x-margin[0])/image_size)
-                y = int(int(y-margin[1])/image_size)
-                if not (x < 0 or x >= Gameboard.Gameboard_size or y < 0 or y >= Gameboard.Gameboard_size):
-                    if (Globals.selected_element == [x, y]):
-                        Globals.selected_element = (-1, -1)
-                    elif Globals.selected_element == (-1, -1):
-                        Globals.selected_element = [x, y]
-                    else:
-                        if coord_distance(Globals.selected_element, [x, y]) <= 1:
-                            Gameboard.swap_elements(Globals.selected_element, [x, y])
-                            Gameboard.check_adjacency(3)
-                            Gameboard.check_drop()
-                            set_game_state(Globals.Game_State.animation)
-                        Globals.selected_element = (-1, -1)
+                try_swap()
         elif event.type == MOUSEMOTION:
             cursor_pos = pygame.mouse.get_pos()
+
+def try_swap():
+    global cursor_pos
+    margin = Globals.margin
+    image_size = Globals.image_size
+    x,y = pygame.mouse.get_pos()
+    x = int(int(x - margin[0]) / image_size)
+    y = int(int(y - margin[1]) / image_size)
+    if not (x < 0 or x >= Gameboard.Gameboard_size or y < 0 or y >= Gameboard.Gameboard_size):
+        if (Globals.selected_element == [x, y]):
+            Globals.selected_element = (-1, -1)
+        elif Globals.selected_element == (-1, -1):
+            Globals.selected_element = [x, y]
+        else:
+            if coord_distance(Globals.selected_element, [x, y]) <= 1:
+                Gameboard.swap_elements(Globals.selected_element, [x, y])
+                old_swap = ([x,y], Globals.selected_element)
+                ## if we didn't get a match, undo this swap
+                if not Gameboard.check_adjacency(3):
+                    Gameboard.swap_elements(old_swap[0], old_swap[1])
+                    return
+                Gameboard.check_drop()
+                set_game_state(Globals.Game_State.animation)
+                Globals.selected_element = (-1, -1)
 
 def update_board():
     Globals.game_state = Game_State.update
