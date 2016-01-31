@@ -2,9 +2,11 @@ import Score
 import Globals
 import sys
 import random
+import Seeds
 
 Gameboard_size = 10
 Gameboard = [[0 for x in range(Gameboard_size)] for x in range(Gameboard_size)]
+seed_size = 5
 
 class Delete_Request:
     x = 0
@@ -18,7 +20,10 @@ class Delete_Request:
         self.y_length = _y_length
 
     def delete(self):
+        global seed_size
         Score.Add_Match(self.x_length + self.y_length)
+        if (self.x_length + self.y_length >= seed_size):
+            Seeds.add_seed(get_element_index(self.x, self.y))
         if self.x_length > 0:
             for i in range(0, self.x_length):
                 delete_object(self.x + i, self.y)

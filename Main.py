@@ -87,6 +87,7 @@ def poll_events():
         elif event.type == MOUSEBUTTONDOWN:
             if event.button == 1:
                 try_swap()
+                Seeds.check_seed_click(pygame.mouse.get_pos())
         elif event.type == MOUSEMOTION:
             cursor_pos = pygame.mouse.get_pos()
 
@@ -204,7 +205,7 @@ def Main():
             if element is not None:
                 element.draw_box(Globals.selected_element)
         draw_score()
-        Seeds.draw_seed_count((432, 236))
+        Seeds.draw_seed_interface()
         pygame.display.flip()
         
     pygame.display.quit()
