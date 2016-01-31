@@ -6,6 +6,7 @@ import TextHandler
 from pygame.locals import *
 import Gameboard
 import Globals
+import Seeds
 
 from enum import IntEnum
 
@@ -187,6 +188,7 @@ def Main():
     Score.Reset_Score()
     Globals.selected_element = (-1, -1)
     Gameboard.check_availible_moves()
+    Seeds.seed_init(len(Globals.all_objects))
     while not Globals.do_quit:
         Globals.screen.fill((0,0,0))
         draw_background()
@@ -202,7 +204,9 @@ def Main():
             if element is not None:
                 element.draw_box(Globals.selected_element)
         draw_score()
+        Seeds.draw_seed_count((432, 236))
         pygame.display.flip()
+        
     pygame.display.quit()
     
 Main()

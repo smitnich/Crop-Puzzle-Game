@@ -26,5 +26,9 @@ def RenderCombo(text, x, y):
         rendered_combo = basic_font.render(text, False, (0, 0, 0))
     Globals.screen.blit(rendered_combo, (x, y))
 
+def get_font():
+    global basic_font
+    return basic_font
+
 def Deinit():
     font.quit()
