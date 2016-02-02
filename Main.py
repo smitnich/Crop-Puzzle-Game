@@ -49,6 +49,13 @@ class Element:
     def draw_true(self, x, y):
         Globals.screen.blit(self.sprite, (x-Globals.image_size/2, y-Globals.image_size/2))
 
+    def grow(self):
+        if self.time_to_grow > 0:
+            self.time_to_grow -= 1
+
+    def is_index(self,index):
+        return self.index == index and self.time_to_grow == 0
+
     def draw_box(self, pos):
         image_size = Globals.image_size
         rectangle = (pos[0]*image_size+Globals.margin[0], pos[1]*image_size+Globals.margin[1], image_size, image_size)
@@ -96,8 +103,12 @@ def poll_events():
                 try_swap()
                 Seeds.check_seed_click(pygame.mouse.get_pos())
             elif event.button == 3:
-                pos = mouse_to_coord(pygame.mouse.get_pos())
-                Gameboard.plant_seed(pos, Seeds.get_selected_seed())
+                selected_seed = Seeds.get_selected_seed()
+                if (Seeds.can_plant(selected_seed)):
+                    pos = mouse_to_coord(pygame.mouse.get_pos())
+                    Gameboard.plant_seed(pos, Seeds.get_selected_seed())
+                    Seeds.remove_seed(selected_seed)
+                Seeds.selected_seed = -1
         elif event.type == MOUSEMOTION:
             cursor_pos = pygame.mouse.get_pos()
 
