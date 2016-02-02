@@ -60,7 +60,6 @@ def draw_seed_interface():
     if (selected_seed != -1):
         Globals.screen.blit(image_cache[selected_seed],pos)
 
-
 def check_seed_click(pos):
     global selected_seed
     x = pos[0]

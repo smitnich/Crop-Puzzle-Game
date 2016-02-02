@@ -20,6 +20,8 @@ def init():
     global cursor_pos
     global game_state
     global anim_progress
+    global seed_sprite
+    global growth_time
     image_size = 32
     margin = (64, 64)
     match_length = 3
@@ -33,4 +35,5 @@ def init():
     cursor_pos = [0, 0]
     game_state = Game_State.ready
     anim_progress = 0.0
-
+    seed_sprite = None
+    growth_time = 3

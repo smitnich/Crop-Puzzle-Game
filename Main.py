@@ -10,6 +10,8 @@ import Seeds
 
 from enum import IntEnum
 
+seed_sprite = None
+
 class Game_State(IntEnum):
     ready = 1
     animation = 2
@@ -21,6 +23,7 @@ class Element:
     moving = False
     sprite = None
     highlighted = False
+    time_to_grow = 0
     def __init__(self, _index):
         self.index = _index
         self.sprite = Globals.image_cache[self.index]
@@ -36,7 +39,10 @@ class Element:
         else:
             x = x*image_size+margin[0]
             y = y*image_size+margin[1]
-        Globals.screen.blit(self.sprite,(x,y))
+        if self.time_to_grow > 0:
+            Globals.screen.blit(Globals.seed_sprite, (x,y))
+        else:
+            Globals.screen.blit(self.sprite,(x,y))
         if self.highlighted:
             self.draw_box((trueX, trueY))
 
@@ -73,6 +79,7 @@ def coord_distance(coord1, coord2):
     return abs(coord1[0]-coord2[0])+abs(coord1[1] - coord2[1])
 
 def poll_events():
+    global selected_seed
     for event in pygame.event.get():
         if event.type == KEYDOWN:
             if event.key == K_ESCAPE:
@@ -88,8 +95,20 @@ def poll_events():
             if event.button == 1:
                 try_swap()
                 Seeds.check_seed_click(pygame.mouse.get_pos())
+            elif event.button == 3:
+                pos = mouse_to_coord(pygame.mouse.get_pos())
+                Gameboard.plant_seed(pos, Seeds.get_selected_seed())
         elif event.type == MOUSEMOTION:
             cursor_pos = pygame.mouse.get_pos()
+
+def mouse_to_coord(pos):
+    image_size = Globals.image_size
+    margin = Globals.margin
+    x = pos[0]
+    y = pos[1]
+    x = int(int(x - margin[0]) / image_size)
+    y = int(int(y - margin[1]) / image_size)
+    return (x,y)
 
 def try_swap():
     global cursor_pos
@@ -126,6 +145,8 @@ def load_images():
     for img in Globals.image_cache:
         img.set_colorkey(transparent)
     Globals.background = pygame.image.load("gfx/background.jpg")
+    Globals.seed_sprite = pygame.image.load("gfx/seed.png")
+    Globals.seed_sprite.set_colorkey(transparent)
 
 def stop_moving():
     for row in Gameboard.Gameboard:

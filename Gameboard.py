@@ -130,6 +130,17 @@ def random_Gameboard():
     check_adjacency(3)
     fill_empty_spaces(3)
 
+def plant_seed(pos, index):
+    global Gameboard
+    from Main import make_element
+    if not Seeds.can_plant(index):
+        return
+    x = pos[0]
+    y = pos[1]
+    obj = make_element(index)
+    obj.time_to_grow = Globals.growth_time
+    Gameboard[x][y] = obj
+
 #Check for any elements that have an empty space below them
 def check_drop():
     from Main import random_object
