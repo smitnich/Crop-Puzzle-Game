@@ -26,7 +26,8 @@ def init():
     image_size = 64
     margin = (64, 64)
     match_length = 3
-    sprite_paths = ['gfx/Eggplant.gif', 'gfx/GreenPepper.gif', 'gfx/Onion.gif', 'gfx/Potato.gif']
+    sprite_paths = ['gfx/Eggplant.gif', 'gfx/GreenPepper.gif', 'gfx/Onion.gif',
+                    'gfx/Potato.gif', 'gfx/Corn.gif', 'gfx/Cabbage.gif']
     image_cache = []
     all_objects = None
     selected_element = [-1, -1]

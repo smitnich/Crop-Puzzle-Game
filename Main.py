@@ -69,11 +69,9 @@ def make_element(index):
     return Element(index)
 
 def create_objects():
-    obj1 = Element(0)
-    obj2 = Element(1)
-    obj3 = Element(2)
-    obj4 = Element(3)
-    Globals.all_objects = [obj1, obj2, obj3, obj4]
+    Globals.all_objects = []
+    for i in range(0, len(Globals.sprite_paths)):
+        Globals.all_objects.append(Element(i))
 
 def random_object():
     return Element(random.randrange(0,len(Globals.all_objects)))
@@ -152,11 +150,13 @@ def load_images():
     #We use light gray as the transparency color currently
     transparent = (200, 200, 200)
     for path in Globals.sprite_paths:
-        Globals.image_cache = Globals.image_cache + [pygame.image.load(path).convert()]
+        surf = pygame.image.load(path).convert()
+        surf = pygame.transform.scale(surf, (64, 64))
+        Globals.image_cache = Globals.image_cache + [surf]
     for img in Globals.image_cache:
         img.set_colorkey(transparent)
     Globals.background = pygame.image.load("gfx/background.jpg")
-    Globals.seed_sprite = pygame.image.load("gfx/seed.png")
+    Globals.seed_sprite = pygame.transform.scale(pygame.image.load("gfx/seed.png"), (64, 64))
     Globals.seed_sprite.set_colorkey(transparent)
 
 def stop_moving():
@@ -166,7 +166,7 @@ def stop_moving():
                 obj.moving = False
 
 def do_animations():
-    Globals.anim_progress += 4
+    Globals.anim_progress += 8
     if Globals.anim_progress >= Globals.image_size:
         Globals.anim_progress = 0.0
         stop_moving()

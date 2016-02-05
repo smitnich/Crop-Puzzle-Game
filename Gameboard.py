@@ -4,9 +4,9 @@ import sys
 import random
 import Seeds
 
-Gameboard_size = 10
+Gameboard_size = 8
 Gameboard = [[0 for x in range(Gameboard_size)] for x in range(Gameboard_size)]
-seed_size = 5
+seed_size = 4
 
 class Delete_Request:
     x = 0
