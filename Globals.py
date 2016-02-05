@@ -22,7 +22,8 @@ def init():
     global anim_progress
     global seed_sprite
     global growth_time
-    image_size = 32
+    global current_turn
+    image_size = 64
     margin = (64, 64)
     match_length = 3
     sprite_paths = ['gfx/Eggplant.gif', 'gfx/GreenPepper.gif', 'gfx/Onion.gif', 'gfx/Potato.gif']

@@ -4,15 +4,16 @@ from pygame import font
 from TextHandler import get_font
 import Globals
 
-font_path = "Base6.ttf"
+font_path = "OpenSans-Regular.ttf"
 basic_font = None
 seed_count = None
 max_count = 9
-draw_pos = (432, 236)
+draw_pos = (600, 236)
 ## A cache of the numbers upto max_count prerendered:
 ## this avoids having to regenerate the texture of each number
 ## when they change
 number_sprites = None
+font_color = (0, 200, 0)
 
 selected_seed = -1
 
@@ -23,7 +24,7 @@ def seed_init(count):
     number_sprites = [None]*max_count
     basic_font = get_font()
     for i in range(0, max_count):
-        number_sprites[i] = basic_font.render(str(i), False, (0, 0, 0))
+        number_sprites[i] = basic_font.render(str(i), False, font_color)
 
 def add_seed(index):
     global seed_count
@@ -55,7 +56,7 @@ def draw_seed_interface():
     image_size = Globals.image_size
     for i in range(0, len(seed_count)):
         Globals.screen.blit(image_cache[i],(x,y+i*image_size))
-        Globals.screen.blit(number_sprites[seed_count[i]], (x+32, y+i*image_size))
+        Globals.screen.blit(number_sprites[seed_count[i]], (x+64, y+i*image_size))
     pos = pygame.mouse.get_pos()
     if (selected_seed != -1):
         Globals.screen.blit(image_cache[selected_seed],pos)
