@@ -23,7 +23,8 @@ class Element:
     moving = False
     sprite = None
     highlighted = False
-    time_to_grow = 0
+    growth_turn = -1
+    grown = True
     def __init__(self, _index):
         self.index = _index
         self.sprite = Globals.image_cache[self.index]
@@ -39,7 +40,7 @@ class Element:
         else:
             x = x*image_size+margin[0]
             y = y*image_size+margin[1]
-        if self.time_to_grow > 0:
+        if not self.grown:
             Globals.screen.blit(Globals.seed_sprite, (x,y))
         else:
             Globals.screen.blit(self.sprite,(x,y))
@@ -50,11 +51,11 @@ class Element:
         Globals.screen.blit(self.sprite, (x-Globals.image_size/2, y-Globals.image_size/2))
 
     def grow(self):
-        if self.time_to_grow > 0:
-            self.time_to_grow -= 1
+        if self.growth_turn > 0 and Globals.current_turn >= self.growth_turn:
+            self.grown = True
 
     def is_index(self,index):
-        return self.index == index and self.time_to_grow == 0
+        return self.index == index and self.grown
 
     def draw_box(self, pos):
         image_size = Globals.image_size
@@ -98,15 +99,16 @@ def poll_events():
             Globals.do_quit = True
         elif event.type == MOUSEBUTTONDOWN:
             if event.button == 1:
-                try_swap()
-                Seeds.check_seed_click(pygame.mouse.get_pos())
-            elif event.button == 3:
                 selected_seed = Seeds.get_selected_seed()
-                if (Seeds.can_plant(selected_seed)):
-                    pos = mouse_to_coord(pygame.mouse.get_pos())
-                    Gameboard.plant_seed(pos, Seeds.get_selected_seed())
-                    Seeds.remove_seed(selected_seed)
-                Seeds.selected_seed = -1
+                if selected_seed != -1:
+                    if (Seeds.can_plant(selected_seed)):
+                        pos = mouse_to_coord(pygame.mouse.get_pos())
+                        Gameboard.plant_seed(pos, Seeds.get_selected_seed())
+                        Seeds.remove_seed(selected_seed)
+                    Seeds.selected_seed = -1
+                else:
+                    try_swap()
+                    Seeds.check_seed_click(pygame.mouse.get_pos())
         elif event.type == MOUSEMOTION:
             cursor_pos = pygame.mouse.get_pos()
 
@@ -172,6 +174,10 @@ def do_animations():
         stop_moving()
         set_game_state(Globals.Game_State.update)
 
+def reset_board():
+    Score.Reset_Combo()
+    Gameboard.random_Gameboard()
+
 def game_loop():
     if Globals.game_state == Globals.Game_State.ready:
         poll_events()
@@ -183,6 +189,9 @@ def game_loop():
         elif not Gameboard.check_adjacency(Globals.match_length):
             set_game_state(Globals.Game_State.ready)
             Score.Reset_Combo()
+            Globals.current_turn += 1
+            if not Gameboard.check_availible_moves():
+                reset_board()
 
 def set_game_state(new_state):
     if new_state < 0 or new_state >= Globals.Game_State.last_state:
@@ -213,7 +222,6 @@ def Main():
     global cursor_pos
     Globals.init()
     Globals.screen = pygame.display.set_mode((1024, 768))
-    random.seed(0)
     TextHandler.Init()
     load_images()
     create_objects()

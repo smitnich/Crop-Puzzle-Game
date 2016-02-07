@@ -39,3 +39,4 @@ def init():
     anim_progress = 0.0
     seed_sprite = None
     growth_time = 3
+    current_turn = 0

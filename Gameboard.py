@@ -137,7 +137,8 @@ def plant_seed(pos, index):
     x = pos[0]
     y = pos[1]
     obj = make_element(index)
-    obj.time_to_grow = Globals.growth_time
+    obj.growth_turn = Globals.current_turn + Globals.growth_time
+    obj.grown = False
     Gameboard[x][y] = obj
 
 #Check for any elements that have an empty space below them
@@ -267,7 +268,7 @@ def fill_empty_spaces(match_length):
 
 def get_element_index(x,y):
     obj = Gameboard[x][y]
-    if obj is None:
+    if obj is None or obj.grown is False:
         return -1
     else:
         return obj.index
