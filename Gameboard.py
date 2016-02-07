@@ -75,37 +75,34 @@ def check_swap_vert(x, y, id, length):
     return False, -1, -1 
 
 def check_availible_moves():
-    try:
-        global Gameboard_size
-        match_length = Globals.match_length
-        offset = match_length - 1
-        ##Check if it is possible to make a horizontal line by moving one tile
-        for y in range(0, Gameboard_size):
-            break
-            l = list((Gameboard[0][y], Gameboard[1][y]))
-            for x in range(offset, Gameboard_size):
-                l.append(Gameboard[x][y])
-                max_count, id = check_max_count(l)
-                if (max_count == match_length - 1):
-                    res, xPos, yPos = check_swap_horiz(x - offset, y, id, match_length)
-                    if res:
-                        return True
-                l.pop(0)
+    global Gameboard_size
+    match_length = Globals.match_length
+    offset = match_length - 1
+    ##Check if it is possible to make a horizontal line by moving one tile
+    for y in range(0, Gameboard_size):
+        break
+        l = list((Gameboard[0][y], Gameboard[1][y]))
+        for x in range(offset, Gameboard_size):
+            l.append(Gameboard[x][y])
+            max_count, id = check_max_count(l)
+            if (max_count == match_length - 1):
+                res, xPos, yPos = check_swap_horiz(x - offset, y, id, match_length)
+                if res:
+                    return True
+            l.pop(0)
 
-        ##Check if it possible to make a vertical line by moving one tile
-        for x in range(0, Gameboard_size):
-            l = list((Gameboard[x][0], Gameboard[x][1]))
-            for y in range(offset, Gameboard_size):
-                l.append(Gameboard[x][y])
-                max_count, id = check_max_count(l)
-                if (max_count == match_length - 1):
-                    res, xPos, yPos = check_swap_vert(x , y - offset, id, match_length)
-                    if res:
-                        return True
-                l.pop(0)
-
-    except:
-        print("Unexpected error:", sys.exc_info()[0])
+    ##Check if it possible to make a vertical line by moving one tile
+    for x in range(0, Gameboard_size):
+        l = list((Gameboard[x][0], Gameboard[x][1]))
+        for y in range(offset, Gameboard_size):
+            l.append(Gameboard[x][y])
+            max_count, id = check_max_count(l)
+            if (max_count == match_length - 1):
+                res, xPos, yPos = check_swap_vert(x , y - offset, id, match_length)
+                if res:
+                    return True
+            l.pop(0)
+    return False
 
 
 def move_element(obj, x, y):
