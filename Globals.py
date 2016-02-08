@@ -23,12 +23,15 @@ def init():
     global seed_sprite
     global growth_time
     global current_turn
+    global poof_sprite
+    global current_ticks
     image_size = 64
     margin = (64, 64)
     match_length = 3
     sprite_paths = ['gfx/Eggplant.gif', 'gfx/GreenPepper.gif', 'gfx/Onion.gif',
                     'gfx/Potato.gif', 'gfx/Corn.gif', 'gfx/Cabbage.gif']
     image_cache = []
+    poof_sprite = None
     all_objects = None
     selected_element = [-1, -1]
     background = None
@@ -40,3 +43,4 @@ def init():
     seed_sprite = None
     growth_time = 3
     current_turn = 0
+    current_ticks = 0

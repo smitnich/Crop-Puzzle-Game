@@ -65,6 +65,13 @@ class Element:
     def update(self):
         if Globals.game_state is not Globals.Game_State.animation:
             self.moving = False
+    
+    def make_poof(self, x, y):
+        from Graphic_Element import make_graphic_element
+        image_size = Globals.image_size
+        x = x*image_size+Globals.margin[0]
+        y = y*image_size+Globals.margin[1]
+        make_graphic_element(Globals.poof_sprite, x, y, get_ticks() + 200)
 
 def make_element(index):
     return Element(index)
@@ -152,14 +159,18 @@ def load_images():
     #We use light gray as the transparency color currently
     transparent = (200, 200, 200)
     for path in Globals.sprite_paths:
-        surf = pygame.image.load(path).convert()
-        surf = pygame.transform.scale(surf, (64, 64))
+        surf = process_image(path)
         Globals.image_cache = Globals.image_cache + [surf]
-    for img in Globals.image_cache:
-        img.set_colorkey(transparent)
+    ## Don't process the background since it isn't transparent or 64 by 64
     Globals.background = pygame.image.load("gfx/background.jpg")
-    Globals.seed_sprite = pygame.transform.scale(pygame.image.load("gfx/seed.png"), (64, 64))
-    Globals.seed_sprite.set_colorkey(transparent)
+    Globals.seed_sprite = process_image("gfx/seed.png")
+    Globals.poof_sprite = process_image("gfx/Poof.png")
+
+def process_image(path):
+    transparent = (200, 200, 200)
+    img = pygame.transform.scale(pygame.image.load(path), (64, 64))
+    img.set_colorkey(transparent)
+    return img
 
 def stop_moving():
     for row in Gameboard.Gameboard:
@@ -204,6 +215,12 @@ def get_selected_element():
 def draw_background():
     Globals.screen.blit(Globals.background, (0, 0))
 
+def update_ticks():
+    Globals.current_ticks = pygame.time.get_ticks()
+
+def get_ticks():
+    return Globals.current_ticks
+
 def draw_score():
     score = Score.Get_Score()
     x_off = Globals.margin[0]*2 + Globals.image_size*Gameboard.Gameboard_size
@@ -217,12 +234,15 @@ def draw_score():
 
 
 def Main():
+    from Graphic_Element import draw_graphic_elements
     if __name__ != "__main__":
         return
+    global current_ticks
     global cursor_pos
     Globals.init()
     Globals.screen = pygame.display.set_mode((1024, 768))
     TextHandler.Init()
+    pygame.init()
     load_images()
     create_objects()
     Gameboard.random_Gameboard()
@@ -231,6 +251,7 @@ def Main():
     Gameboard.check_availible_moves()
     Seeds.seed_init(len(Globals.all_objects))
     while not Globals.do_quit:
+        update_ticks()
         Globals.screen.fill((0,0,0))
         draw_background()
         game_loop()
@@ -246,6 +267,7 @@ def Main():
                 element.draw_box(Globals.selected_element)
         draw_score()
         Seeds.draw_seed_interface()
+        draw_graphic_elements(get_ticks())
         pygame.display.flip()
         
     pygame.display.quit()

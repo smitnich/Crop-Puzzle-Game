@@ -7,6 +7,7 @@ import Seeds
 Gameboard_size = 8
 Gameboard = [[0 for x in range(Gameboard_size)] for x in range(Gameboard_size)]
 seed_size = 4
+game_started = False
 
 class Delete_Request:
     x = 0
@@ -21,6 +22,7 @@ class Delete_Request:
 
     def delete(self):
         global seed_size
+        global game_started
         Score.Add_Match(self.x_length + self.y_length)
         if (self.x_length + self.y_length >= seed_size):
             Seeds.add_seed(get_element_index(self.x, self.y))
@@ -31,7 +33,8 @@ class Delete_Request:
             for i in range(0, self.y_length):
                 delete_object(self.x, self.y + i)
         ## Grow any seeds on the board
-        grow_seeds()
+        if game_started:
+            grow_seeds()
 
 def check_max_count(in_list):
     max_count = 0
@@ -121,6 +124,7 @@ def random_Gameboard():
     global Gameboard_size
     global Gameboard
     global image_size
+    global game_started
     for x in range(0, Gameboard_size):
         for y in range(0, Gameboard_size):
             obj = random_object()
@@ -128,6 +132,7 @@ def random_Gameboard():
     ## Don't let any matches exist when the board is created
     check_adjacency(3)
     fill_empty_spaces(3)
+    game_started = True
 
 def plant_seed(pos, index):
     global Gameboard
@@ -173,6 +178,8 @@ def delete_object(x,y):
     global Gameboard_size
     if (x > Gameboard_size or y > Gameboard_size or x < 0 or y < 0):
         return
+    if game_started:
+        Gameboard[x][y].make_poof(x, y)
     Gameboard[x][y] = None
 
 def swap_elements(first, second):
