@@ -178,7 +178,7 @@ def delete_object(x,y):
     global Gameboard_size
     if (x > Gameboard_size or y > Gameboard_size or x < 0 or y < 0):
         return
-    if game_started:
+    if game_started and Gameboard[x][y] is not None:
         Gameboard[x][y].make_poof(x, y)
     Gameboard[x][y] = None
 
