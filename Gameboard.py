@@ -235,8 +235,11 @@ def check_adjacent_count(index, x, y, match_length):
     l = match_length - 1
 
     for i in range(max(0, x - l), min(Gameboard_size, x + l)):
-        if (Gameboard[i][y] == index):
-            c = c + 1
+        ##We're checking ourselves here, so its an automatic match
+        if (i == x):
+            c += 1
+        elif (Gameboard[i][y] is not None and Gameboard[i][y].index == index):
+            c += 1
         else:
             if c > c_max:
                 c_max = c
@@ -247,8 +250,10 @@ def check_adjacent_count(index, x, y, match_length):
     c = 0
 
     for i in range(max(0, y - l), min(Gameboard_size, y + l)):
-        if (Gameboard[x][i] == index):
-            c = c + 1
+        if (i == y):
+            c += 1
+        elif (Gameboard[x][i] is not None and Gameboard[x][i].index == index):
+            c += 1
         else:
             if c > c_max:
                 c_max = c
