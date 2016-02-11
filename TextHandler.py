@@ -3,14 +3,16 @@ from pygame import font
 
 font_path = "Base6.ttf"
 basic_font = None
-font_color = (0, 200, 0)
+font_color = (255, 255, 255)
 
 def Init():
     global font_path
     global basic_font
     global rendered_text
+    global huge_font
     font.init()
     basic_font = font.Font(font_path, 32)
+    huge_font = font.Font(font_path, 64)
     rendered_text = None
 
 def RenderScore(text, x, y):
@@ -33,3 +35,9 @@ def get_font():
 
 def Deinit():
     font.quit()
+
+def Render_TextBox(text, textColor):
+    global huge_font
+    text_box = huge_font.render(text, True, textColor)
+    Globals.screen.blit(text_box, (100, 100))
+    return text_box

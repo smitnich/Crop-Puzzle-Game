@@ -8,12 +8,12 @@ font_path = "OpenSans-Regular.ttf"
 basic_font = None
 seed_count = None
 max_count = 9
-draw_pos = (600, 236)
+draw_pos = (575, 200)
 ## A cache of the numbers upto max_count prerendered:
 ## this avoids having to regenerate the texture of each number
 ## when they change
 number_sprites = None
-font_color = (0, 200, 0)
+font_color = (255, 255, 255)
 
 selected_seed = -1
 

@@ -7,6 +7,7 @@ from pygame.locals import *
 import Gameboard
 import Globals
 import Seeds
+import Graphic_Element
 
 from enum import IntEnum
 
@@ -206,6 +207,8 @@ def game_loop():
             Score.Reset_Combo()
             Globals.current_turn += 1
             if not Gameboard.check_availible_moves():
+                Graphic_Element.make_graphic_element(
+                    TextHandler.Render_TextBox("Shuffling Board",(255,255,255)), 250, 250, get_ticks() + 1000)
                 reset_board()
 
 def set_game_state(new_state):
@@ -232,8 +235,8 @@ def draw_score():
     TextHandler.RenderScore(str(score), x_off, y_off)
     combo = Score.Get_Combo()
     x_off = Globals.margin[0]*2 + Globals.image_size*Gameboard.Gameboard_size
-    y_off = Globals.margin[1]*2
-    TextHandler.RenderCombo(("Multiplier: " + str(combo)), x_off, y_off)
+    y_off = Globals.margin[1]+64
+    TextHandler.RenderCombo(("x" + str(combo)), x_off, y_off)
     Globals.update_score = False
 
 
