@@ -110,8 +110,12 @@ def poll_events():
                 if selected_seed != -1:
                     if (Seeds.can_plant(selected_seed)):
                         pos = mouse_to_coord(pygame.mouse.get_pos())
-                        Gameboard.plant_seed(pos, Seeds.get_selected_seed())
-                        Seeds.remove_seed(selected_seed)
+                        if (pos[0] < 0 or pos[0] > Gameboard.Gameboard_size or
+                            pos[1] < 0 or pos[1] > Gameboard.Gameboard_size):
+                            Seeds.selected_seed = -1
+                        else:
+                            Gameboard.plant_seed(pos, Seeds.get_selected_seed())
+                            Seeds.remove_seed(selected_seed)
                     Seeds.selected_seed = -1
                 else:
                     try_swap()
