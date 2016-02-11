@@ -240,7 +240,7 @@ def Main():
     global current_ticks
     global cursor_pos
     Globals.init()
-    Globals.screen = pygame.display.set_mode((1024, 768))
+    Globals.screen = pygame.display.set_mode((Globals.screenX, Globals.screenY))
     TextHandler.Init()
     pygame.init()
     load_images()

@@ -25,8 +25,10 @@ def init():
     global current_turn
     global poof_sprite
     global current_ticks
+    global screenX
+    global screenY
     image_size = 64
-    margin = (64, 64)
+    margin = (16, 16)
     match_length = 3
     sprite_paths = ['gfx/Eggplant.gif', 'gfx/GreenPepper.gif', 'gfx/Onion.gif',
                     'gfx/Potato.gif', 'gfx/Corn.gif', 'gfx/Cabbage.gif']
@@ -44,3 +46,5 @@ def init():
     growth_time = 3
     current_turn = 0
     current_ticks = 0
+    screenX = 800
+    screenY = 600
