@@ -19,14 +19,14 @@ def RenderScore(text, x, y):
     global basic_font
     global rendered_text
     if Globals.update_score or rendered_text is None:
-        rendered_text = basic_font.render(text, False, font_color)
+        rendered_text = basic_font.render(text, True, font_color)
     Globals.screen.blit(rendered_text, (x, y))
 
 def RenderCombo(text, x, y):
     global basic_font
     global rendered_combo
     if Globals.update_score or rendered_combo is None:
-        rendered_combo = basic_font.render(text, False, font_color)
+        rendered_combo = basic_font.render(text, True, font_color)
     Globals.screen.blit(rendered_combo, (x, y))
 
 def get_font():
@@ -39,5 +39,4 @@ def Deinit():
 def Render_TextBox(text, textColor):
     global huge_font
     text_box = huge_font.render(text, True, textColor)
-    Globals.screen.blit(text_box, (100, 100))
     return text_box

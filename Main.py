@@ -17,7 +17,8 @@ class Game_State(IntEnum):
     ready = 1
     animation = 2
     update = 3
-    last_state = 4
+    game_over = 4
+    last_state = 5
 
 class Element:
     index = 0
@@ -98,15 +99,17 @@ def poll_events():
         if event.type == KEYDOWN:
             if event.key == K_ESCAPE:
                 cleanup()
-            elif event.key == K_SPACE:
-                Gameboard.check_adjacency(3)
-            elif event.key == K_RETURN:
-                Gameboard.check_drop()
-                set_game_state(Globals.Game_State.animation)
+            elif Globals.game_state == Globals.Game_State.game_over:
+                Globals.do_quit = True
+                Globals.do_new_game = True
         elif event.type == QUIT:
             Globals.do_quit = True
         elif event.type == MOUSEBUTTONDOWN:
             if event.button == 1:
+                if Globals.game_state == Globals.Game_State.game_over:
+                    Globals.do_quit = True
+                    Globals.do_new_game = True
+                    return
                 selected_seed = Seeds.get_selected_seed()
                 if selected_seed != -1:
                     if (Seeds.can_plant(selected_seed)):
@@ -194,8 +197,15 @@ def reset_board():
     Score.Reset_Combo()
     Gameboard.random_Gameboard()
 
+def game_over():
+    Graphic_Element.make_graphic_element(
+        TextHandler.Render_TextBox("Game Over",(255,255,255)), 250, 250, -1)
+    set_game_state(Globals.Game_State.game_over)
+
 def game_loop():
-    if Globals.game_state == Globals.Game_State.ready:
+    if (get_ticks() >= Globals.end_time and Globals.game_state != Globals.Game_State.game_over):
+        game_over()
+    elif Globals.game_state == Globals.Game_State.ready:
         poll_events()
     elif Globals.game_state == Globals.Game_State.animation:
         do_animations()
@@ -210,6 +220,9 @@ def game_loop():
                 Graphic_Element.make_graphic_element(
                     TextHandler.Render_TextBox("Shuffling Board",(255,255,255)), 250, 250, get_ticks() + 1000)
                 reset_board()
+    elif Globals.game_state == Globals.Game_State.game_over:
+        poll_events()
+
 
 def set_game_state(new_state):
     if new_state < 0 or new_state >= Globals.Game_State.last_state:
@@ -228,10 +241,14 @@ def update_ticks():
 def get_ticks():
     return Globals.current_ticks
 
+def set_start_time():
+    Globals.start_time = pygame.time.get_ticks()
+    Globals.end_time = Globals.start_time + 1000*60*3
+
 def draw_score():
     score = Score.Get_Score()
     x_off = Globals.margin[0]*2 + Globals.image_size*Gameboard.Gameboard_size
-    y_off = Globals.margin[1]
+    y_off = Globals.margin[1] + Globals.image_size*2
     TextHandler.RenderScore(str(score), x_off, y_off)
     combo = Score.Get_Combo()
     x_off = Globals.margin[0]*2 + Globals.image_size*Gameboard.Gameboard_size
@@ -239,26 +256,34 @@ def draw_score():
     TextHandler.RenderCombo(("x" + str(combo)), x_off, y_off)
     Globals.update_score = False
 
+def draw_time_left():
+    time_left = Globals.end_time - get_ticks()
+    min_left = int(time_left / (60*1000))
+    sec_left = int((time_left % (60*1000))/1000)
+    x_off = Globals.margin[0]*2 + Globals.image_size*Gameboard.Gameboard_size
+    y_off = Globals.margin[1]
+    if (sec_left < 10):
+        sec_str = "0" + str(sec_left)
+    else:
+        sec_str = str(sec_left)
+    time_str = str(min_left) + ":" + sec_str
+    text_box = TextHandler.get_font().render(time_str, True, (255, 255, 255))
+    Globals.screen.blit(text_box, (x_off, y_off))
 
-def Main():
+def new_game():
     from Graphic_Element import draw_graphic_elements
-    if __name__ != "__main__":
-        return
-    global current_ticks
-    global cursor_pos
-    Globals.init()
-    Globals.screen = pygame.display.set_mode((Globals.screenX, Globals.screenY))
-    TextHandler.Init()
-    pygame.init()
-    load_images()
-    create_objects()
+    Globals.do_new_game = False
     Gameboard.random_Gameboard()
     Score.Reset_Score()
     Globals.selected_element = (-1, -1)
     Gameboard.check_availible_moves()
-    Seeds.seed_init(len(Globals.all_objects))
+    set_start_time()
+    set_game_state(Globals.Game_State.ready)
+    Graphic_Element.clear_graphic_elements()
+    Seeds.reset()
     while not Globals.do_quit:
         update_ticks()
+        Globals.clock.tick()
         Globals.screen.fill((0,0,0))
         draw_background()
         game_loop()
@@ -274,9 +299,29 @@ def Main():
                 element.draw_box(Globals.selected_element)
         draw_score()
         Seeds.draw_seed_interface()
+        if Globals.game_state != Globals.Game_State.game_over:
+            draw_time_left()
         draw_graphic_elements(get_ticks())
         pygame.display.flip()
-        
+        Globals.clock.tick_busy_loop(60)
+    Globals.do_quit = False        
+
+
+def Main():
+    if __name__ != "__main__":
+        return
+    global current_ticks
+    global cursor_pos
+    Globals.init()
+    Globals.clock = pygame.time.Clock()
+    Globals.screen = pygame.display.set_mode((Globals.screenX, Globals.screenY))
+    TextHandler.Init()
+    pygame.init()
+    load_images()
+    create_objects()
+    Seeds.seed_init(len(Globals.all_objects))
+    while Globals.do_new_game:
+        new_game()
     pygame.display.quit()
     
 Main()

@@ -24,7 +24,11 @@ def seed_init(count):
     number_sprites = [None]*max_count
     basic_font = get_font()
     for i in range(0, max_count):
-        number_sprites[i] = basic_font.render(str(i), False, font_color)
+        number_sprites[i] = basic_font.render(str(i), True, font_color)
+
+def reset():
+    global seed_count
+    seed_count = [0]*len(seed_count)
 
 def add_seed(index):
     global seed_count

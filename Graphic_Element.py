@@ -25,3 +25,7 @@ def make_graphic_element(_sprite, x, y, _death_time):
     e.pos = (x, y)
     e.sprite = _sprite
     all_graphic_elements.append(e)
+
+def clear_graphic_elements():
+    global all_graphic_elements
+    all_graphic_elements = []
