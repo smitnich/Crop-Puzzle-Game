@@ -3,6 +3,7 @@ import Globals
 import sys
 import random
 import Seeds
+import Audio
 
 Gameboard_size = 8
 Gameboard = [[0 for x in range(Gameboard_size)] for x in range(Gameboard_size)]
@@ -35,6 +36,7 @@ class Delete_Request:
         ## Grow any seeds on the board
         if game_started:
             grow_seeds()
+            Audio.Match()
 
 def check_max_count(in_list):
     max_count = 0
@@ -113,7 +115,6 @@ def move_element(obj, x, y):
     if (x < 0) or (y < 0) or x > (Gameboard_size) or (y > Gameboard_size):
         return
     if Gameboard[x][y] is not None:
-        print(x,y," is not None")
         return
     Gameboard[x][y] = obj
     if obj is not None:

@@ -8,6 +8,7 @@ import Gameboard
 import Globals
 import Seeds
 import Graphic_Element
+import Audio
 
 from enum import IntEnum
 
@@ -159,6 +160,8 @@ def try_swap():
                 Gameboard.check_drop()
                 set_game_state(Globals.Game_State.animation)
                 Globals.selected_element = (-1, -1)
+            else:
+                Audio.Cancel()
 
 def update_board():
     Globals.game_state = Game_State.update
@@ -312,6 +315,7 @@ def Main():
         return
     global current_ticks
     global cursor_pos
+    Audio.Init()
     Globals.init()
     Globals.clock = pygame.time.Clock()
     Globals.screen = pygame.display.set_mode((Globals.screenX, Globals.screenY))
